@@ -231,3 +231,22 @@ claude mcp add --transport http medusa-cloud https://cloud.medusajs.com/mcp # or
 - `.env` / `.env.local` — never commit, print, or copy secret values out of them. Edit `.env.template` instead when documenting a new variable.
 - Existing migrations in `src/modules/*/migrations/` — add a new migration rather than rewriting one that may already have run.
 - Don't run destructive DB commands (drops, resets) against the user's database without explicit confirmation.
+
+## Project notes (Eagles & Eaglets store extraction)
+
+This repo is the standalone store extracted from the Eagles & Eaglets Django
+platform; see `docs/adr/0001-extract-store-into-medusa.md` and `docs/runbooks.md`.
+
+- `apps/backend/src/api/middlewares/platform-auth.ts` validates platform-minted
+  store tokens (`STORE_TENANTS`, `src/lib/store-tenants.ts`) and maps the
+  `(iss, sub)` pair to a Medusa customer (`src/lib/platform-customer.ts`).
+  Never resolve identity by email.
+- `apps/backend/src/modules/paystack` is the only payment provider for GHS;
+  it is registered in `medusa-config.ts` only when `PAYSTACK_SECRET_KEY` is set.
+- `apps/backend/src/subscribers/order-*.ts` deliver signed order events to the
+  tenant's `events_url`; `src/jobs/reconcile-platform-orders.ts` replays them.
+- Integration specs that depend on `medusa-config.ts` reading an env var must
+  set `process.env` at the top of the file: the test runner loads the config
+  before applying the suite's `env`.
+- `apps/storefront` is the Medusa Next.js starter kept as a local preview of
+  the customer side. The production storefront is the platform's React app.

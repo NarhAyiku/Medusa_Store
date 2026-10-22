@@ -1,0 +1,10 @@
+node_modules
+**/node_modules
+**/.medusa
+**/.turbo
+**/.next
+apps/storefront
+**/.env
+**/.env.*
+!**/.env.template
+.git
